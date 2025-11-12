@@ -21,20 +21,31 @@
             templateID = String(templateID).trim().replace(/[^\w-]/g, match => match === '_' || match === '-' ? match : '');
 
             console.log("Using Service ID:", JSON.stringify(serviceID), "Template ID:", JSON.stringify(templateID));
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            
+            // Afficher toutes les données du formulaire
+            console.log("=== DONNÉES DU FORMULAIRE ===");
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            console.log("=============================");
+            
             console.log("Envoi en cours...");
 
-            const form = e.target;
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Envoi..."; }
 
             emailjs.sendForm(serviceID, templateID, form)
                 .then((response) => {
-                    console.log("Succès!", response.status, response.text);
+                    console.log("✅ Succès!", response.status, response.text);
+                    console.log("Response complète:", response);
                     alert("✅ Merci, votre inscription a bien été envoyée !");
                     document.getElementById("formulaire").reset();
                 })
                 .catch((error) => {
-                    console.error("Erreur complète:", error);
+                    console.error("❌ Erreur complète:", error);
                     let message = "❌ Une erreur est survenue. Réessayez plus tard.";
                     try {
                         if (error && typeof error === 'object') {
