@@ -12,59 +12,39 @@
 
         function envoyerEmail(e) {
             e.preventDefault();
-            // ⚠️ TAPEZ manuellement vos IDs ci-dessous (ne copiez pas!)
+            
             let serviceID = "service_qwlbv1k";
-            let templateID = "template_u9962bc";
+            let templateID = "template_5w0ezmf";
 
-            // Nettoyage de sécurité
-            serviceID = String(serviceID).trim().replace(/[^\w-]/g, match => match === '_' || match === '-' ? match : '');
-            templateID = String(templateID).trim().replace(/[^\w-]/g, match => match === '_' || match === '-' ? match : '');
-
-            console.log("Using Service ID:", JSON.stringify(serviceID), "Template ID:", JSON.stringify(templateID));
-            
             const form = e.target;
-            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
             
-            // Afficher toutes les données du formulaire
-            console.log("=== DONNÉES DU FORMULAIRE ===");
+            if (submitBtn) { 
+                submitBtn.disabled = true; 
+                submitBtn.textContent = "Envoi en cours..."; 
+            }
+
+            console.log("=== ENVOI VIA EMAILJS ===");
+            const formData = new FormData(form);
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}: ${value}`);
             }
-            console.log("=============================");
-            
-            console.log("Envoi en cours...");
-
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Envoi..."; }
 
             emailjs.sendForm(serviceID, templateID, form)
                 .then((response) => {
                     console.log("✅ Succès!", response.status, response.text);
-                    console.log("Response complète:", response);
-                    alert("✅ Merci, votre inscription a bien été envoyée !");
-                    document.getElementById("formulaire").reset();
+                    alert("✅ Merci ! Votre inscription a bien été envoyée.");
+                    form.reset();
                 })
                 .catch((error) => {
-                    console.error("❌ Erreur complète:", error);
-                    let message = "❌ Une erreur est survenue. Réessayez plus tard.";
-                    try {
-                        if (error && typeof error === 'object') {
-                            if (error.status || error.text) {
-                                message = `❌ Erreur ${error.status || ''}: ${error.text || ''}`.trim();
-                            } else if (error.message) {
-                                message = `❌ ${error.message}`;
-                            }
-                        }
-                    } catch (e) {}
-
-                    if (String(error).includes('service ID not found') || (error && error.text && error.text.includes('service ID not found'))) {
-                        message += "\n(Vérifiez que le Service ID est exactement celui du dashboard et qu'il est 'Connected'.)";
-                        console.warn("Vérifiez le dashboard: https://dashboard.emailjs.com/admin/services");
-                    }
-                    alert(message);
+                    console.error("❌ Erreur:", error);
+                    alert("❌ Une erreur est survenue. Veuillez réessayer.");
                 })
                 .finally(() => {
-                    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Confirmer mon inscription"; }
+                    if (submitBtn) { 
+                        submitBtn.disabled = false; 
+                        submitBtn.textContent = "Confirmer mon inscription"; 
+                    }
                 });
         }
     </script>
